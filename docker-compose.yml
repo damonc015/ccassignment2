@@ -1,0 +1,19 @@
+services:
+  web:
+    build: .
+    image: damonc015/cchw2:1.0
+    ports:
+      - "5001:5000"
+    environment:
+      MONGO_HOST: mongo
+      MONGO_PORT: "27017"
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:6.0
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
