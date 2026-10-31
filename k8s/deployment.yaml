@@ -19,9 +19,23 @@ spec:
     spec:
       containers:
         - name: web
-          image: damonc015/cchw2:1.0
+          image: damonc015/cchw2:3.0
           ports:
             - containerPort: 5000
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 5000
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 2
           env:
             - name: MONGO_HOST
               value: mongo

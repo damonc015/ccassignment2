@@ -1,18 +1,19 @@
 from flask import Flask, render_template,request,redirect,url_for # For flask implementation
 from pymongo import MongoClient # Database connector
+from pymongo.errors import PyMongoError
 from bson.objectid import ObjectId # For ObjectId to work
 from bson.errors import InvalidId # For catching InvalidId exception for ObjectId
 import os
 
 mongodb_host = os.environ.get('MONGO_HOST', 'localhost')
 mongodb_port = int(os.environ.get('MONGO_PORT', '27017'))
-client = MongoClient(mongodb_host, mongodb_port)    #Configure the connection to the database
+client = MongoClient(mongodb_host, mongodb_port, serverSelectionTimeoutMS=2000)    #Configure the connection to the database
 db = client.camp2016    #Select the database
 todos = db.todo #Select the collection
 
 app = Flask(__name__)
 title = "TODO with Flask"
-heading = "ToDo Reminder v2"
+heading = "ToDo Reminder v3"
 #modify=ObjectId()
 
 def redirect_url():
@@ -118,6 +119,20 @@ def search():
 @app.route("/about")
 def about():
 	return render_template('credits.html',t=title,h=heading)
+
+@app.route("/health")
+def health():
+	if os.path.exists("/tmp/unhealthy"):
+		return "unhealthy", 500
+	return "ok"
+
+@app.route("/ready")
+def ready():
+	try:
+		client.admin.command("ping")
+	except PyMongoError:
+		return "mongo unavailable", 503
+	return "ok"
 
 if __name__ == "__main__":
 	env = os.environ.get('FLASK_ENV', 'development')
