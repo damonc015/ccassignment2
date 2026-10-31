@@ -5,3 +5,4 @@ __pycache__
 venv
 docker-compose.yml
 .dockerignore
+notes.md
